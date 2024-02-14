@@ -74,5 +74,5 @@ Server.get('/getIP', function (req, res) {
 Server.use(express.static(path.join(__dirname, 'public')));
 
 Server.listen(8888, function () {
-    console.log('Speedtest Server is up and running!');
+    console.log('Speedtest Server is up and running! http://127.0.0.1:8888/');
 });

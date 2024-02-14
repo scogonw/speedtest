@@ -48,9 +48,6 @@ function Speedtest() {
   this._selectedServer = null; //when using multiple points of test, this is the selected server
   this._settings = {}; //settings for the speedtest worker
   this._state = 0; //0=adding settings, 1=adding servers, 2=server selection done, 3=test running, 4=done
-  console.log(
-    "LibreSpeed by Federico Dossena v5.1 - https://github.com/librespeed/speedtest"
-  );
 }
 
 Speedtest.prototype = {

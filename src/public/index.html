@@ -69,6 +69,13 @@ function startStop(){
 		};
 		s.onend=function(aborted){
             I("startStopBtn").className="";
+			if(!aborted){
+				const testData=JSON.parse(s._prevData);
+				console.log("DOWN", testData.dlStatus);
+				console.log("UP", testData.ulStatus);
+				console.log("PING", testData.pingStatus);
+				console.log("JITTER", testData.jitterStatus);
+			}
             updateUI(true);
 		};
 		s.start();
@@ -218,25 +225,12 @@ function initUI(){
 		}
 	}
 </style>
-<title>LibreSpeed Example</title>
+<title>Scogo SpeedTest</title>
 </head>
 <body>
-<h1>LibreSpeed Example</h1>
+<h1>Scogo SpeedTest</h1>
 <div id="testWrapper">
-	<div id="startStopBtn" onclick="startStop()"></div>
 	<div id="test">
-        <div class="testGroup">
-			<div class="testArea2">
-				<div class="testName">Ping</div>
-				<div id="pingText" class="meterText" style="color:#AA6060"></div>
-				<div class="unit">ms</div>
-			</div>
-			<div class="testArea2">
-				<div class="testName">Jitter</div>
-				<div id="jitText" class="meterText" style="color:#AA6060"></div>
-				<div class="unit">ms</div>
-			</div>
-		</div>
 		<div class="testGroup">
 			<div class="testArea">
 				<div class="testName">Download</div>
@@ -251,6 +245,19 @@ function initUI(){
 				<div class="unit">Mbps</div>
 			</div>
 		</div>
+        <div class="testGroup">
+			<div class="testArea2">
+				<div class="testName">Ping</div>
+				<div id="pingText" class="meterText" style="color:#AA6060"></div>
+				<div class="unit">ms</div>
+			</div>
+			<div class="testArea2">
+				<div class="testName">Jitter</div>
+				<div id="jitText" class="meterText" style="color:#AA6060"></div>
+				<div class="unit">ms</div>
+			</div>
+		</div>
+		<div id="startStopBtn" onclick="startStop()"></div>
 		<div id="ipArea">
 			<span id="ip"></span>
 		</div>

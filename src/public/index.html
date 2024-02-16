@@ -11,12 +11,14 @@ function I(i){return document.getElementById(i);}
 var s=new Speedtest(); //create speedtest object
 
 var meterBk=/Trident.*rv:(\d+\.\d+)/i.test(navigator.userAgent)?"#EAEAEA":"#80808040";
-var dlColor="#6060AA",
-	ulColor="#616161";
-var progColor=meterBk;
+var dlColorStart="#11c0fc",
+	dlColorEnd="#78ff81",
+	ulColorStart="#9861e7";
+	ulColorEnd="#ff71ab";
+var progColor="#26b3b2";
 
 //CODE FOR GAUGES
-function drawMeter(c,amount,bk,fg,progress,prog){
+function drawMeter(c,amount,bk,fgStart,fgEnd,progress,prog){
 	var ctx=c.getContext("2d");
 	var dp=window.devicePixelRatio||1;
 	var cw=c.clientWidth*dp, ch=c.clientHeight*dp;
@@ -27,16 +29,33 @@ function drawMeter(c,amount,bk,fg,progress,prog){
 		c.width=cw;
 		c.height=ch;
 	}
+
 	ctx.beginPath();
 	ctx.strokeStyle=bk;
 	ctx.lineWidth=12*sizScale;
 	ctx.arc(c.width/2,c.height-58*sizScale,c.height/1.8-ctx.lineWidth,-Math.PI*1.1,Math.PI*0.1);
 	ctx.stroke();
+
+	var grd = ctx.createLinearGradient(0, 0, c.width, 0);
+    grd.addColorStop(0, fgStart);
+    grd.addColorStop(1, fgEnd);
+
+	ctx.shadowColor = fgStart	; // Adjust the shadow color and opacity as needed
+	ctx.shadowBlur = 15; // Adjust the blur radius of the shadow
+	ctx.shadowOffsetX = 0; // Adjust the horizontal offset of the shadow
+	ctx.shadowOffsetY = 5;
+
 	ctx.beginPath();
-	ctx.strokeStyle=fg;
+	ctx.strokeStyle=grd;
 	ctx.lineWidth=12*sizScale;
 	ctx.arc(c.width/2,c.height-58*sizScale,c.height/1.8-ctx.lineWidth,-Math.PI*1.1,amount*Math.PI*1.2-Math.PI*1.1);
 	ctx.stroke();
+
+	ctx.shadowColor = 'rgba(0, 0, 0, 0)';
+	ctx.shadowBlur = 0;
+	ctx.shadowOffsetX = 0;
+	ctx.shadowOffsetY = 0;
+	
 	if(typeof progress !== "undefined"){
 		ctx.fillStyle=prog;
 		ctx.fillRect(c.width*0.3,c.height-16*sizScale,c.width*0.4*progress,4*sizScale);
@@ -52,6 +71,78 @@ function format(d){
     return d.toFixed(0);
 }
 
+var startButton=document.createElement("div");
+	startButton.id="ringEffect";
+	startButton.addEventListener("click",startStop);
+	startButton.innerHTML=`<div id="pulsator"></div>
+			<div id="startStopBtn"><p>GO</p></div>`;
+
+var dlGauge=document.createElement("div");
+dlGauge.classList.add("testArea");
+dlGauge.id="dlGauge";
+dlGauge.innerHTML=`<canvas id="dlMeter" class="meter"></canvas>
+				<div id="dlText" class="meterText"></div>
+				<div class="unit">Mbps</div>`;
+
+var ulGauge=document.createElement("div");
+ulGauge.classList.add("testArea");
+ulGauge.id="ulGauge";
+ulGauge.innerHTML=`<canvas id="ulMeter" class="meter"></canvas>
+				<div id="ulText" class="meterText"></div>
+				<div class="unit">Mbps</div>`;
+
+function generateResult(data){
+	var result=document.createElement("div");
+	result.id="result";
+	result.innerHTML=`<div class="makeitflex">
+							<div class="makeitinline" id="ipInfoAndGoButtonBox">
+								<div id="ipInfoBox">
+									<div class="makeitinline">
+										<img src="globe.svg" alt="">
+										<div class="makeitblock">
+											<h3>User ISP</h3>
+											<span class="makeitgrey">user City</span>
+											<span class="makeitgrey">user IP</span>
+										</div>
+									</div>
+									<div class="makeitinline">
+										<img src="person.svg" alt="">
+										<div class="makeitblock">
+											<h3 >Scogo Networks</h3>
+											<span class="makeitgrey">Mumbai</span>
+											<span class="makeitgrey">127.0.0.1</span>
+										</div>
+									</div>
+								</div>
+								<div id="resultGoButtonBox">
+									<div id="ringEffectSmall" onclick="startStop()">
+										<div id="pulsatorSmall"></div>
+										<div id="startStopBtnSmall"><p>GO</p></div>
+									</div>
+								</div>
+							</div>
+							<div id="feedbackBox">
+								<p>
+									HOW DOES YOUR DOWNLOAD SPEED COMPARE<br>WITH YOUR EXPECTATIONS ?	
+								</p>
+								<div id="feedbackButtons">
+									<div>1</div>
+									<div>2</div>
+									<div>3</div>
+									<div>4</div>
+									<div>5</div>
+								</div>	
+							</div>
+						</div>`;
+	I("testGroup").style.animation=`disappear 2s`;
+	setTimeout(()=>{
+		I("testGroup").innerHTML="";
+		I("test").insertBefore(result,I("testGroup"));
+	},2000);
+}
+
+
+
 //UI CODE
 var uiData=null;
 function startStop(){
@@ -59,26 +150,43 @@ function startStop(){
 		//speedtest is running, abort
 		s.abort();
 		data=null;
-		I("startStopBtn").className="";
 		initUI();
 	}else{
 		//test is not running, begin
-		I("startStopBtn").className="running";
+		if(I("ringEffect")){
+			I("ringEffect").style.animation=`disappear 2s`;
+		}
+		if(I("result")){
+			I("result").style.animation=`disappear 2s`;
+		}
+		setTimeout(()=>{
+			if(I("ringEffect")){
+				I("ringEffect").remove();
+			}
+			if(I("result")){
+				I("result").remove();
+			}
+			I("testGroup").appendChild(dlGauge);
+			drawMeter(I("dlMeter"),0,meterBk,dlColorStart,dlColorEnd,0);
+		},2000);
 		s.onupdate=function(data){
             uiData=data;
 		};
 		s.onend=function(aborted){
-            I("startStopBtn").className="";
 			if(!aborted){
 				const testData=JSON.parse(s._prevData);
 				console.log("DOWN", testData.dlStatus);
 				console.log("UP", testData.ulStatus);
 				console.log("PING", testData.pingStatus);
 				console.log("JITTER", testData.jitterStatus);
+				console.log("CLIENT IP", testData.clientIp);
 			}
-            updateUI(true);
+            // updateUI(true);
+			generateResult();
 		};
-		s.start();
+		setTimeout(()=>{
+			s.start();
+		},2000)
 	}
 }
 //this function reads the data sent back by the test and updates the UI
@@ -86,13 +194,28 @@ function updateUI(forced){
 	if(!forced&&s.getState()!=3) return;
 	if(uiData==null) return;
 	var status=uiData.testState;
+
 	I("ip").textContent=uiData.clientIp;
-	I("dlText").textContent=(status==1&&uiData.dlStatus==0)?"...":format(uiData.dlStatus);
-	drawMeter(I("dlMeter"),mbpsToAmount(Number(uiData.dlStatus*(status==1?oscillate():1))),meterBk,dlColor,Number(uiData.dlProgress),progColor);
-	I("ulText").textContent=(status==3&&uiData.ulStatus==0)?"...":format(uiData.ulStatus);
-	drawMeter(I("ulMeter"),mbpsToAmount(Number(uiData.ulStatus*(status==3?oscillate():1))),meterBk,ulColor,Number(uiData.ulProgress),progColor);
-	I("pingText").textContent=format(uiData.pingStatus);
-	I("jitText").textContent=format(uiData.jitterStatus);
+
+	I("dlText2").textContent=(status==1&&uiData.dlStatus==0)?"...":format(uiData.dlStatus);
+	if(status==1){
+		I("dlText").textContent=(status==1&&uiData.dlStatus==0)?"...":format(uiData.dlStatus);
+		drawMeter(I("dlMeter"),mbpsToAmount(Number(uiData.dlStatus*(status==1?oscillate():1))),meterBk,dlColorStart,dlColorEnd,Number(uiData.dlProgress),dlColorStart);
+	}
+
+	I("ulText2").textContent=(status==3&&uiData.ulStatus==0)?"...":format(uiData.ulStatus);
+	if(status==3){
+		if(I("dlGauge")){
+			I("dlGauge").remove();
+			I("testGroup").appendChild(ulGauge);
+		}
+		I("ulText").textContent=(status==3&&uiData.ulStatus==0)?"...":format(uiData.ulStatus);
+		drawMeter(I("ulMeter"),mbpsToAmount(Number(uiData.ulStatus*(status==3?oscillate():1))),meterBk,ulColorStart,ulColorEnd,Number(uiData.ulProgress),ulColorStart);
+	}
+
+	I("pingText2").textContent=format(uiData.pingStatus);
+
+	I("jitText2").textContent=format(uiData.jitterStatus);
 }
 function oscillate(){
 	return 1+0.02*Math.sin(Date.now()/100);
@@ -105,164 +228,104 @@ function frame(){
 }
 frame(); //start frame loop
 //function to (re)initialize UI
+
 function initUI(){
-	drawMeter(I("dlMeter"),0,meterBk,dlColor,0);
-	drawMeter(I("ulMeter"),0,meterBk,ulColor,0);
-	I("dlText").textContent="";
-	I("ulText").textContent="";
-	I("pingText").textContent="";
-	I("jitText").textContent="";
+	// drawMeter(I("dlMeter"),0,meterBk,dlColor,0);
+	// drawMeter(I("ulMeter"),0,meterBk,ulColor,0);
+	I("dlText2").textContent="0.00";
+	I("ulText2").textContent="0.00";
+	I("test").insertBefore(startButton,I("testGroup"));
+	I("pingText2").textContent="0";
+	I("jitText2").textContent="0";
 	I("ip").textContent="";
 }
+
+
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition,showError);
+  } else {
+    console.log("Geolocation is not supported by this browser.");
+  }
+}
+
+function showPosition(position) {
+	console.log(position);
+	console.log( "Latitude: " + position.coords.latitude +
+	"<br>Longitude: " + position.coords.longitude);
+}
+
+function showError(error) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      console.log("User denied the request for Geolocation.")
+      break;
+    case error.POSITION_UNAVAILABLE:
+      console.log("Location information is unavailable.")
+      break;
+    case error.TIMEOUT:
+      console.log("The request to get user location timed out.")
+      break;
+    case error.UNKNOWN_ERROR:
+      console.log("An unknown error occurred.")
+      break;
+  }
+}
+getLocation();
 </script>
-<style type="text/css">
-	html,body{
-		border:none; padding:0; margin:0;
-		background:#FFFFFF;
-		color:#202020;
-	}
-	body{
-		text-align:center;
-		font-family:"Roboto",sans-serif;
-	}
-	h1{
-		color:#404040;
-	}
-	#startStopBtn{
-		display:inline-block;
-		margin:0 auto;
-		color:#6060AA;
-		background-color:rgba(0,0,0,0);
-		border:0.15em solid #6060FF;
-		border-radius:0.3em;
-		transition:all 0.3s;
-		box-sizing:border-box;
-		width:8em; height:3em;
-		line-height:2.7em;
-		cursor:pointer;
-		box-shadow: 0 0 0 rgba(0,0,0,0.1), inset 0 0 0 rgba(0,0,0,0.1);
-	}
-	#startStopBtn:hover{
-		box-shadow: 0 0 2em rgba(0,0,0,0.1), inset 0 0 1em rgba(0,0,0,0.1);
-	}
-	#startStopBtn.running{
-		background-color:#FF3030;
-		border-color:#FF6060;
-		color:#FFFFFF;
-	}
-	#startStopBtn:before{
-		content:"Start";
-	}
-	#startStopBtn.running:before{
-		content:"Abort";
-	}
-	#test{
-		margin-top:2em;
-		margin-bottom:12em;
-	}
-	div.testArea{
-		display:inline-block;
-		width:16em;
-		height:12.5em;
-		position:relative;
-		box-sizing:border-box;
-	}
-	div.testArea2{
-		display:inline-block;
-		width:14em;
-		height:7em;
-		position:relative;
-		box-sizing:border-box;
-		text-align:center;
-	}
-	div.testArea div.testName{
-		position:absolute;
-		top:0.1em; left:0;
-		width:100%;
-		font-size:1.4em;
-		z-index:9;
-	}
-	div.testArea2 div.testName{
-        display:block;
-        text-align:center;
-        font-size:1.4em;
-	}
-	div.testArea div.meterText{
-		position:absolute;
-		bottom:1.55em; left:0;
-		width:100%;
-		font-size:2.5em;
-		z-index:9;
-	}
-	div.testArea2 div.meterText{
-        display:inline-block;
-        font-size:2.5em;
-	}
-	div.meterText:empty:before{
-		content:"0.00";
-	}
-	div.testArea div.unit{
-		position:absolute;
-		bottom:2em; left:0;
-		width:100%;
-		z-index:9;
-	}
-	div.testArea2 div.unit{
-		display:inline-block;
-	}
-	div.testArea canvas{
-		position:absolute;
-		top:0; left:0; width:100%; height:100%;
-		z-index:1;
-	}
-	div.testGroup{
-		display:block;
-        margin: 0 auto;
-	}
-	@media all and (max-width:40em){
-		body{
-			font-size:0.8em;
-		}
-	}
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 <title>Scogo SpeedTest</title>
 </head>
 <body>
 <h1>Scogo SpeedTest</h1>
 <div id="testWrapper">
 	<div id="test">
-		<div class="testGroup">
-			<div class="testArea">
-				<div class="testName">Download</div>
-				<canvas id="dlMeter" class="meter"></canvas>
-				<div id="dlText" class="meterText"></div>
-				<div class="unit">Mbps</div>
+		<div id="dlulStatus">
+			<div>
+				<div class="makeitinline">
+					<object data="download.svg"></object>
+					<div>DOWNLOAD <span class="makeitgrey">Mbps</span></div>
+				</div>
+				<div id="dlText2" class="meterText"></div>
+				<div class="pingandjitter">
+					<span>Ping </span>
+					<span class="makeitgrey">ms</span>
+					<img src="ping.png" alt="">
+					<span id="pingText2">0</span>
+				</div>
 			</div>
-			<div class="testArea">
-				<div class="testName">Upload</div>
-				<canvas id="ulMeter" class="meter"></canvas>
-				<div id="ulText" class="meterText"></div>
-				<div class="unit">Mbps</div>
+			<div>
+				<div class="makeitinline">
+					<object data="upload.svg"></object>
+					<div>UPLOAD <span class="makeitgrey">Mbps</span></div>
+				</div>
+				<div id="ulText2" class="meterText"></div>
+				<div class="pingandjitter">
+					<span>Jitter </span>
+					<span class="makeitgrey">ms</span>
+					<img src="jitter.png" alt="">
+					<span id="jitText2">0</span>
+				</div>
 			</div>
 		</div>
-        <div class="testGroup">
-			<div class="testArea2">
-				<div class="testName">Ping</div>
-				<div id="pingText" class="meterText" style="color:#AA6060"></div>
-				<div class="unit">ms</div>
-			</div>
-			<div class="testArea2">
-				<div class="testName">Jitter</div>
-				<div id="jitText" class="meterText" style="color:#AA6060"></div>
-				<div class="unit">ms</div>
-			</div>
+		<!-- <div id="ringEffect" onclick="startStop()">
+			<div id="pulsator"></div>
+			<div id="startStopBtn"><p>GO</p></div>
+		</div> -->
+		<!--Pulsating Button is appended here -->
+		<div class="testGroup" id="testGroup">
+				<!-- Gauge is appended here -->
 		</div>
-		<div id="startStopBtn" onclick="startStop()"></div>
+
 		<div id="ipArea">
 			<span id="ip"></span>
 		</div>
 	</div>
-	<a href="https://github.com/librespeed/speedtest">Source code</a>
+	<!-- <a href="https://github.com/librespeed/speedtest">Source code</a> -->
 </div>
 <script type="text/javascript">setTimeout(function(){initUI()},100);</script>
 </body>

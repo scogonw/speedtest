@@ -53,6 +53,7 @@ Server.get('/getIP', function (req, res) {
     if (requestIP.substr(0, 7) === "::ffff:") {
         requestIP = requestIP.substr(7)
     }
+    requestIP="182.50.68.138";
     request('https://ipinfo.io/' + requestIP + '/json', function (err, body, ipData) {
         ipData = JSON.parse(ipData);
         if (err) res.send(requestIP);
@@ -75,4 +76,4 @@ Server.use(express.static(path.join(__dirname, 'public')));
 
 Server.listen(8888, function () {
     console.log('Speedtest Server is up and running! http://127.0.0.1:8888/');
-});
+}); 

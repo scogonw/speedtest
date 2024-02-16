@@ -1,0 +1,266 @@
+html,body{
+    border:none; padding:0; margin:0;
+    color:#fefeff;
+}
+body{
+    text-align:center;
+    font-family:"Montserrat","Montserrat-Fixed","Avenir","Avenir Next LT Pro","Corbel","URW Gothic","source-sans-pro",sans-serif;
+    background-color: #141526;
+}
+h1{
+    font-weight: 400;
+}
+h3{
+    margin: 0;
+}
+#dlulStatus{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5em;
+}
+.makeitgrey{
+    color: #868891;
+}
+/* #868891 */
+
+.makeitinline{
+    display: flex;
+    gap: 0.5em;
+}
+.pingandjitter{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1em;
+}
+#dlText2{
+    font-size: 2.5em;
+}
+#ulText2{
+    font-size: 2.5em;
+}
+#startStopBtn{
+    margin:0 auto;
+    color:#6060AA;
+    border:0.15em solid #26b3b2;
+    border-radius:50%;
+    width:12em; height:12em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#startStopBtn>p{
+    font-size: 3em;
+    color: #fefeff;
+}
+#startStopBtn:hover{
+    background-color: #151f2f;
+}
+#startStopBtn.running{
+    display: none;
+}
+
+#startStopBtn.running:before{
+    content:"Abort";
+}
+#ringEffect{
+    display:inline-block;
+    width:12em; height:12em;
+    border-radius:50%;
+    margin-top: 2em;
+    cursor: pointer;
+    position: relative;
+}
+#ringEffect:hover{
+    background-color: #151f2f;
+}
+#pulsator{
+    border:0.15em solid #26b3b2;
+    width:12em; height:12em;
+    border-radius: 50%;
+    position: absolute;
+    animation: pulse 2s infinite linear;
+}
+#pulsator:hover{
+    display: hidden;
+    animation-name: none;
+}
+#result{
+    display: inline-block;
+    width: 28em;
+    height: 20em;
+}
+.makeitflex{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-evenly;
+}
+#ipInfoAndGoButtonBox{
+    height: 50%;
+}
+#ipInfoBox{
+    flex-grow: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: space-evenly;
+}
+.makeitblock{
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+#resultGoButtonBox{
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#ringEffectSmall{
+    display:inline-block;
+    width:8em; height:8em;
+    border-radius:50%;
+    cursor: pointer;
+    position: relative;
+}
+#ringEffectSmall:hover{
+    background-color: #151f2f;
+}
+#pulsatorSmall{
+    border:0.15em solid #26b3b2;
+    width:8em; height:8em;
+    border-radius: 50%;
+    position: absolute;
+    animation: pulse 2s infinite linear;
+}
+#pulsatorSmall:hover{
+    display: hidden;
+    animation-name: none;
+}
+#startStopBtnSmall{
+    margin:0 auto;
+    color:#6060AA;
+    border:0.15em solid #26b3b2;
+    border-radius:50%;
+    width:8em; height:8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#startStopBtnSmall:hover{
+    background-color: #151f2f;
+}
+#startStopBtnSmall>p{
+    font-size: 1.5em;
+    color: #fefeff;
+}
+#feedbackButtons{
+    display: flex;
+    width: 100%;
+    height: 2.5em;
+    gap: 1px;
+    justify-content: center;
+    align-items: center;
+}
+#feedbackButtons>div{
+    width: 19%;
+    height: 2.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3b3c51;
+}
+#pulsator.running{
+    display: none;
+}
+#test{
+    margin-top:2em;
+    margin-bottom:12em;
+}
+div.testArea{
+    display:inline-block;
+    width:24em;
+    height:18.75em;
+    position:relative;
+    box-sizing:border-box;
+}
+div.testArea2{
+    display:inline-block;
+    width:14em;
+    height:7em;
+    position:relative;
+    box-sizing:border-box;
+    text-align:center;
+}
+div.testArea div.testName{
+    position:absolute;
+    top:0.1em; left:0;
+    width:100%;
+    font-size:1.4em;
+    z-index:9;
+}
+div.testArea2 div.testName{
+    display:block;
+    text-align:center;
+    font-size:1.4em;
+}
+div.testArea div.meterText{
+    position:absolute;
+    bottom:1.55em; left:0;
+    width:100%;
+    font-size:2.5em;
+    z-index:9;
+}
+div.testArea2 div.meterText{
+    display:inline-block;
+    font-size:2.5em;
+}
+div.meterText:empty:before{
+    content:"0.00";
+}
+div.testArea div.unit{
+    position:absolute;
+    bottom:2em; left:0;
+    width:100%;
+    z-index:9;
+}
+div.testArea2 div.unit{
+    display:inline-block;
+}
+div.testArea canvas{
+    position:absolute;
+    top:0; left:0; width:100%; height:100%;
+    z-index:1;
+}
+div.testGroup{
+    display:block;
+    margin: 0 auto;
+}
+@media all and (max-width:40em){
+    body{
+        font-size:0.8em;
+    }
+}
+@keyframes pulse {
+0% {
+    transform: scale(1);
+    opacity: 1;
+}
+100% {
+    transform: scale(1.3);
+    opacity: 0;
+}
+
+}
+
+@keyframes disappear {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+    
+}

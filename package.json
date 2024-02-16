@@ -13,6 +13,9 @@
     "random-bytes": "^1.0.0",
     "request": "^2.85.0"
   },
+  "scripts": {
+    "start":"node src/SpeedTest.js"
+  },
   "pkg": {
     "assets": [
       "src/public/**/*"

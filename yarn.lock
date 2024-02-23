@@ -214,6 +214,11 @@
   "resolved" "https://registry.npmjs.org/destroy/-/destroy-1.0.4.tgz"
   "version" "1.0.4"
 
+"dotenv@^16.4.5":
+  "integrity" "sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg=="
+  "resolved" "https://registry.npmjs.org/dotenv/-/dotenv-16.4.5.tgz"
+  "version" "16.4.5"
+
 "ecc-jsbn@~0.1.1":
   "integrity" "sha512-8Pvg9QY16SYajEL9W1Lk+9yM7XCK/MOq2wibslLZYAAEEkbAIO6mLkW+GFYbvvw8qTuDFzFMg40rS9IxkNCWPg=="
   "resolved" "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"

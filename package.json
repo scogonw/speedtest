@@ -7,14 +7,15 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "express": "^4.16.3",
     "cors": "^2.8.5",
+    "express": "^4.16.3",
     "gps-distance": "^0.0.4",
+    "mongoose": "^8.2.0",
     "random-bytes": "^1.0.0",
     "request": "^2.85.0"
   },
   "scripts": {
-    "start":"node src/SpeedTest.js"
+    "start": "node src/SpeedTest.js"
   },
   "pkg": {
     "assets": [

@@ -98,7 +98,7 @@ function generateResult(data){
 							<div class="makeitinline" id="ipInfoAndGoButtonBox">
 								<div id="ipInfoBox">
 									<div class="makeitinline">
-										<img src="globe.svg" alt="">
+										<img src="icons/globe.svg" alt="">
 										<div class="makeitblock">
 											<h3>User ISP</h3>
 											<span class="makeitgrey">user City</span>
@@ -106,7 +106,7 @@ function generateResult(data){
 										</div>
 									</div>
 									<div class="makeitinline">
-										<img src="person.svg" alt="">
+										<img src="icons/person.svg" alt="">
 										<div class="makeitblock">
 											<h3 >Scogo Networks</h3>
 											<span class="makeitgrey">Mumbai</span>
@@ -134,11 +134,11 @@ function generateResult(data){
 								</div>	
 							</div>
 						</div>`;
-	I("testGroup").style.animation=`disappear 2s`;
+	I("testGroup").style.animation=`disappear 1s`;
 	setTimeout(()=>{
 		I("testGroup").innerHTML="";
 		I("test").insertBefore(result,I("testGroup"));
-	},2000);
+	},1000);
 }
 
 
@@ -154,10 +154,10 @@ function startStop(){
 	}else{
 		//test is not running, begin
 		if(I("ringEffect")){
-			I("ringEffect").style.animation=`disappear 2s`;
+			I("ringEffect").style.animation=`disappear 1s`;
 		}
 		if(I("result")){
-			I("result").style.animation=`disappear 2s`;
+			I("result").style.animation=`disappear 1s`;
 		}
 		setTimeout(()=>{
 			if(I("ringEffect")){
@@ -168,7 +168,7 @@ function startStop(){
 			}
 			I("testGroup").appendChild(dlGauge);
 			drawMeter(I("dlMeter"),0,meterBk,dlColorStart,dlColorEnd,0);
-		},2000);
+		},1000);
 		s.onupdate=function(data){
             uiData=data;
 		};
@@ -186,7 +186,7 @@ function startStop(){
 		};
 		setTimeout(()=>{
 			s.start();
-		},2000)
+		},1000)
 	}
 }
 //this function reads the data sent back by the test and updates the UI
@@ -240,7 +240,7 @@ function initUI(){
 	I("ip").textContent="";
 }
 
-
+// Location code , success = showPosition, error = showError
 
 function getLocation() {
   if (navigator.geolocation) {
@@ -251,9 +251,8 @@ function getLocation() {
 }
 
 function showPosition(position) {
-	console.log(position);
 	console.log( "Latitude: " + position.coords.latitude +
-	"<br>Longitude: " + position.coords.longitude);
+	" Longitude: " + position.coords.longitude);
 }
 
 function showError(error) {
@@ -273,6 +272,44 @@ function showError(error) {
   }
 }
 getLocation();
+
+//  URL Param Code
+
+const urlParams = new URLSearchParams(window.location.search);
+const isp = urlParams.get('isp');
+window.onload=()=>{
+	setLogo(isp);
+	console.log(window.navigator.userAgent);
+}
+
+
+// Logo Set code
+function setLogo(isp){
+	I("brandLogo").setAttribute('src',getLogo(isp));
+}
+
+function getLogo(isp){
+	let path='logos';
+	switch(isp){
+		case 'tata':{
+			return path+"/tcl.svg";
+		}
+		case 'spectra':{
+			return path+"/spectra.png";
+		}
+		case 'connect4sure':{
+			return path+"/connect4sure.png";
+		}
+		case 'airowire':{
+			return path+"/airowire.svg";
+		}
+		case 'jio':{
+			return path+"/jio.svg";
+		}
+	}
+	return path+"/scogo.png";
+}
+
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -281,33 +318,36 @@ getLocation();
 <title>Scogo SpeedTest</title>
 </head>
 <body>
-<h1>Scogo SpeedTest</h1>
+<!-- <h1>Scogo SpeedTest</h1> -->
+<div id="brandLogoContainer">
+	<img src="logos/tcl.svg" alt="" id="brandLogo">
+</div>
 <div id="testWrapper">
 	<div id="test">
 		<div id="dlulStatus">
 			<div>
 				<div class="makeitinline">
-					<object data="download.svg"></object>
+					<object data="icons/download.svg"></object>
 					<div>DOWNLOAD <span class="makeitgrey">Mbps</span></div>
 				</div>
 				<div id="dlText2" class="meterText"></div>
 				<div class="pingandjitter">
 					<span>Ping </span>
 					<span class="makeitgrey">ms</span>
-					<img src="ping.png" alt="">
+					<img src="icons/ping.png" alt="">
 					<span id="pingText2">0</span>
 				</div>
 			</div>
 			<div>
 				<div class="makeitinline">
-					<object data="upload.svg"></object>
+					<object data="icons/upload.svg"></object>
 					<div>UPLOAD <span class="makeitgrey">Mbps</span></div>
 				</div>
 				<div id="ulText2" class="meterText"></div>
 				<div class="pingandjitter">
 					<span>Jitter </span>
 					<span class="makeitgrey">ms</span>
-					<img src="jitter.png" alt="">
+					<img src="icons/jitter.png" alt="">
 					<span id="jitText2">0</span>
 				</div>
 			</div>
@@ -323,6 +363,9 @@ getLocation();
 
 		<div id="ipArea">
 			<span id="ip"></span>
+		</div>
+		<div id="userAgent">
+			<span id="device"></span>
 		</div>
 	</div>
 	<!-- <a href="https://github.com/librespeed/speedtest">Source code</a> -->

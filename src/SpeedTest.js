@@ -5,6 +5,9 @@ const path = require('path');
 const request = require('request');
 const helpers = require('./Helpers');
 const cors = require('cors');
+const mongoose = require('mongoose');
+
+const dbUrl = 'mongodb+srv://scogo:Scogo%40007@cluster0.dweyxzp.mongodb.net/ScogoSpeedTest?retryWrites=true&w=majority&appName=Cluster0';
 
 let cache;
 
@@ -72,8 +75,20 @@ Server.get('/getIP', function (req, res) {
     });
 });
 
+Server.use(express.json());
+
+Server.get('/health',(req,res)=>{
+    res.status(200).json({'message':"System up and running"});
+})
+
 Server.use(express.static(path.join(__dirname, 'public')));
 
-Server.listen(8888, function () {
+Server.listen(8888, async function () {
+    try {
+        await mongoose.connect(dbUrl);
+        console.log('Connected to MongoDB');
+    } catch (error) {
+        console.error('Error connecting to MongoDB:', error);
+    }
     console.log('Speedtest Server is up and running! http://127.0.0.1:8888/');
 }); 

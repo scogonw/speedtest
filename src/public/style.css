@@ -7,6 +7,9 @@ body{
     font-family:"Montserrat","Montserrat-Fixed","Avenir","Avenir Next LT Pro","Corbel","URW Gothic","source-sans-pro",sans-serif;
     background-color: #141526;
 }
+.hidden{
+    display: none;
+}
 h1{
     font-weight: 400;
 }
@@ -253,6 +256,9 @@ div.testArea canvas{
 div.testGroup{
     display:block;
     margin: 0 auto;
+}
+#ipArea{
+    margin-top: 4em;
 }
 @media all and (max-width:40em){
     body{

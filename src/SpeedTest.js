@@ -6,6 +6,7 @@ const request = require('request');
 const helpers = require('./Helpers');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const TestResult = require('./models/speedtest.model');
 require('dotenv').config();
 
 let cache;
@@ -55,7 +56,6 @@ Server.get('/getIP', function (req, res) {
     if (requestIP.substr(0, 7) === "::ffff:") {
         requestIP = requestIP.substr(7)
     }
-    requestIP="182.50.68.138";
     request('https://ipinfo.io/' + requestIP + '/json', function (err, body, ipData) {
         ipData = JSON.parse(ipData);
         if (err) res.send(requestIP);
@@ -79,6 +79,70 @@ Server.use(express.json());
 Server.get('/health',(req,res)=>{
     res.status(200).json({'message':"System up and running"});
 })
+
+Server.post('/saveResult',async (req,res)=>{
+    try {
+        const testResult= new TestResult(req.body);
+        await testResult.save();
+        res.status(200).json({'message':'Test Result saved','data':testResult});
+    } catch (error) {
+        res.status(500).json({'message':"Test Result save failed","error":error.message});
+    }
+})
+
+Server.get('/getResult',async (req,res)=>{
+    try {
+        let testResult;
+        if(req.query.id){
+            testResult=await TestResult.findById(req.query.id);
+            res.status(200).json({'message':`Result of id ${req.query.id}`,'data':testResult});
+        }
+        else{
+            testResult=await TestResult.find();
+            res.status(200).json({'message':'List of all results','data':testResult});
+        }
+    } catch (error) {
+        res.status(500).json({'message':"Test Results fetch failed","error":error.message});
+    }
+})
+
+Server.get('/getResultByTenantid/:id',async (req,res)=>{
+    try {
+        let id=req.params.id;
+        if(id){
+            const testResult=await TestResult.find({tenant_id:id});
+            res.status(200).json({'message':`List of results with tenant id ${id}`,'data':testResult});
+        }
+        else{
+            res.status(400).json({'message':'tenant id required'});
+        }
+    } catch (error) {
+        res.status(500).json({'message':"Test Results fetch failed","error":error.message});
+    }
+})
+
+Server.get('/ipInfo',async (req,res)=>{
+    try {
+        let requestIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.headers['HTTP_CLIENT_IP'] || req.headers['X-Real-IP'] || req.headers['HTTP_X_FORWARDED_FOR'];
+        if (requestIP.substr(0, 7) === "::ffff:") {
+            requestIP = requestIP.substr(7)
+        }   
+        request(`https://ipinfo.io/${requestIP}/json`,(error, response, body)=>{
+            if(error){
+                res.status(500).json({'message':"IP Info fetch failed","error":error.message});
+            }
+            else{
+                body=JSON.parse(body);
+                res.status(200).json({'message':"IP Info succesfully fetched",'data':body});
+            }
+        })
+    } catch (error) {
+        res.status(500).json({'message':"IP Info fetch failed","error":error.message});
+    }
+})
+
+// Server.get('/')
+
 
 Server.use(express.static(path.join(__dirname, 'public')));
 

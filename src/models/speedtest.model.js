@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const testResultSchema = new mongoose.Schema({
     user_id: {
@@ -13,15 +13,24 @@ const testResultSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Location'
     },
+    location:{
+        user_allowed:Boolean,
+        lat: Number,
+        long: Number,
+        accuracy: Number,
+        city: String
+    },
     timestamp: Date,
     download: Number,
     upload: Number,
     ping: Number,
     jitter: Number,
+    client_backhaul_ISP:String,
     client_ipv4: String,
     client_ipv6: String,
     server_ip: String,
     device: String
 });
 
-export const TestResult = mongoose.model('TestResult', testResultSchema);
+const TestResult = mongoose.model('TestResult', testResultSchema);
+module.exports=TestResult;

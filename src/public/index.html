@@ -23,7 +23,14 @@ var apiTestData={
     lat: 0,
     long: 0,
     accuracy: 0,
-    city: ""
+    city: "",
+	state:"",
+	pin_code:'',
+	plus_code:{
+		compound_code:'',
+		global_code:''
+	},
+	address:''
   },
   timestamp: "",
   download: 0,
@@ -287,11 +294,11 @@ function getLocation() {
 }
 
 function showPosition(position) {
-	console.log( "Latitude: " + position.coords.latitude +" Longitude: " + position.coords.longitude);
 	apiTestData.location.user_allowed=true;
 	apiTestData.location.lat=position.coords.latitude;
 	apiTestData.location.long=position.coords.longitude;
 	apiTestData.location.accuracy=position.coords.accuracy;
+	getLocationGoogleAPI();
 }
 
 function showError(error) {
@@ -379,7 +386,7 @@ async function getIPinfo(){
 	try {
 		const response = await fetch ('/ipInfo');
 		const data = await response.json();
-		console.log(data.data);
+		console.log("ip",data.data);
 		if(ipv6Regex.test(data.data.ip)){
 			apiTestData.client_ipv6=data.data.ip;
 		}
@@ -390,6 +397,24 @@ async function getIPinfo(){
 		I('ip').textContent=data.data.ip;
 	} catch (error) {
 		console.log(error); //change in future
+	}
+}
+
+//get client location by lat long
+
+async function getLocationGoogleAPI(){
+	try {
+		const response= await fetch (`/getLocation?lat=${apiTestData.location.lat}&long=${apiTestData.location.long}`);
+		const data = await response.json();
+		console.log("location",data.data);
+		apiTestData.location.city=data.data.city;
+		apiTestData.location.pin_code=data.data.pin_code;
+		apiTestData.location.state=data.data.state;
+		apiTestData.location.address=data.data.address;
+		apiTestData.location.plus_code.compound_code=data.data.plus_code.compound_code;
+		apiTestData.location.plus_code.global_code=data.data.plus_code.global_code;
+	} catch (error) {
+		console.log(error); // change in furture
 	}
 }
 

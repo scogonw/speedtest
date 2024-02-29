@@ -162,8 +162,8 @@ Server.get('/getLocation',async(req, res)=>{
                     global_code:body?.plus_code?.global_code
                 }
                 const relevant_data=body?.results[0];
-                response.address=relevant_data.formatted_address;
-                response.pin_code=relevant_data.address_components.filter((e)=>{
+                response.address=relevant_data?.formatted_address;
+                response.pin_code=relevant_data?.address_components?.filter((e)=>{
                     if(e.types?.includes('postal_code')){
                         return true;
                     }

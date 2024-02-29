@@ -141,7 +141,43 @@ Server.get('/ipInfo',async (req,res)=>{
     }
 })
 
-// Server.get('/')
+const googleMapsURL=`https://maps.googleapis.com/maps/api/geocode/json?latlng=`
+
+Server.get('/getLocation',async(req, res)=>{
+    try {
+        const lat=req.query.lat;
+        const long=req.query.long;
+        if(!lat || !long){
+            throw new Error("lat long query required as ?lat=&long=");
+        }
+        request(`${googleMapsURL}${lat},${long}&key=${process.env.GOOGLE_API_KEY}`,(error, response, body)=>{
+            if(error){
+                res.status(500).json({'message':"Location fetch Failed","error":error.message});
+            }
+            else{
+                const response={};
+                body=JSON.parse(body);
+                response.plus_code={
+                    compound_code:body?.plus_code?.compound_code,
+                    global_code:body?.plus_code?.global_code
+                }
+                const relevant_data=body?.results[0];
+                response.address=relevant_data.formatted_address;
+                response.pin_code=relevant_data.address_components.filter((e)=>{
+                    if(e.types?.includes('postal_code')){
+                        return true;
+                    }
+                    return false;
+                })[0].long_name || '';
+                response.city=body?.plus_code?.compound_code?.split(',')[0]?.split(' ')?.slice(1)?.join(' ')?.trim();
+                response.state=body?.plus_code?.compound_code?.split(',')[1]?.trim();
+                res.status(200).json({'message':"Location succesfully fetched",'data':response});
+            }
+        })
+    } catch (error) {
+        res.status(500).json({'message':"Location fetch Failed","error":error.message});
+    }
+})
 
 
 Server.use(express.static(path.join(__dirname, 'public')));

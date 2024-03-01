@@ -9,16 +9,19 @@ const testResultSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tenant'
     },
-    location_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Location'
-    },
     location:{
         user_allowed:Boolean,
         lat: Number,
         long: Number,
         accuracy: Number,
-        city: String
+        city: String,
+        address:String,
+        pin_code:String,
+        state:String,
+        plus_code:{
+            compound_code:String,
+            global_code:String
+        }
     },
     timestamp: Date,
     download: Number,
